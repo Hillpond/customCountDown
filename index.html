@@ -970,7 +970,7 @@
 
         const days = Math.floor(distance / dayMs);
         const hours = Math.floor((distance % dayMs) / hourMs);
-        const minutes = Math.floor((distance % dayMs) / minuteMs);
+        const minutes = Math.floor((distance % hourMs) / minuteMs);
         const seconds = Math.floor((distance % minuteMs) / secondMs);
 
         daysEl.textContent = pad(days);
@@ -1051,7 +1051,7 @@
 
       const days = Math.floor(distance / dayMs);
       const hours = Math.floor((distance % dayMs) / hourMs);
-      const minutes = Math.floor((distance % dayMs) / minuteMs);
+      const minutes = Math.floor((distance % hourMs) / minuteMs);
       const seconds = Math.floor((distance % minuteMs) / secondMs);
 
       const totalHours = Math.floor(distance / hourMs);
