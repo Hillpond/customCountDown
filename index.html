@@ -330,6 +330,14 @@
       animation: fadeIn 0.4s ease-out;
     }
 
+    .detail-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.8rem;
+    }
+
     .back-btn {
       border: none;
       background: transparent;
@@ -339,7 +347,6 @@
       align-items: center;
       gap: 0.3rem;
       cursor: pointer;
-      margin-bottom: 0.8rem;
       padding: 0.15rem 0.4rem;
     }
 
@@ -349,6 +356,38 @@
 
     .back-btn span {
       font-size: 1.1rem;
+    }
+
+    .detail-delete-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: rgba(127, 29, 29, 0.95);
+      color: #fecaca;
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.9),
+        0 0 14px rgba(248, 113, 113, 0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    .detail-delete-btn:hover {
+      background: rgba(185, 28, 28, 1);
+      transform: translateY(-1px);
+    }
+
+    .detail-delete-btn:active {
+      transform: translateY(0);
+      box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.9),
+        0 0 10px rgba(248, 113, 113, 0.4);
     }
 
     .detail-card {
@@ -676,9 +715,14 @@
     </section>
 
     <section id="detail-view">
-      <button id="back-button" class="back-btn">
-        <span>←</span> Back to overview
-      </button>
+      <div class="detail-top-bar">
+        <button id="back-button" class="back-btn">
+          <span>←</span> Back to overview
+        </button>
+        <button id="detail-delete-button" class="detail-delete-btn" type="button">
+          ✕ Delete
+        </button>
+      </div>
 
       <div id="detail-card" class="detail-card" data-mode="full">
         <div class="detail-glow" aria-hidden="true"></div>
@@ -754,6 +798,9 @@
     const detailHoursEl = document.getElementById("detail-hours");
     const detailMinutesEl = document.getElementById("detail-minutes");
     const detailSecondsEl = document.getElementById("detail-seconds");
+
+    const backButton = document.getElementById("back-button");
+    const detailDeleteButton = document.getElementById("detail-delete-button");
 
     function loadEvents() {
       try {
@@ -923,7 +970,7 @@
 
         const days = Math.floor(distance / dayMs);
         const hours = Math.floor((distance % dayMs) / hourMs);
-        const minutes = Math.floor((distance % hourMs) / minuteMs);
+        const minutes = Math.floor((distance % dayMs) / minuteMs);
         const seconds = Math.floor((distance % minuteMs) / secondMs);
 
         daysEl.textContent = pad(days);
@@ -1004,7 +1051,7 @@
 
       const days = Math.floor(distance / dayMs);
       const hours = Math.floor((distance % dayMs) / hourMs);
-      const minutes = Math.floor((distance % hourMs) / minuteMs);
+      const minutes = Math.floor((distance % dayMs) / minuteMs);
       const seconds = Math.floor((distance % minuteMs) / secondMs);
 
       const totalHours = Math.floor(distance / hourMs);
@@ -1068,13 +1115,18 @@
       startDetailTimer();
     }
 
-    document.getElementById("back-button").addEventListener("click", () => {
+    backButton.addEventListener("click", () => {
       detailSection.style.display = "none";
       landingSection.style.display = "block";
       if (detailIntervalId) {
         clearInterval(detailIntervalId);
         detailIntervalId = null;
       }
+    });
+
+    detailDeleteButton.addEventListener("click", () => {
+      if (!currentEventId) return;
+      deleteEvent(currentEventId);
     });
 
     document.querySelectorAll(".detail-mode-btn").forEach((btn) => {
