@@ -678,11 +678,11 @@
     <section id="landing">
       <h1 class="landing-title">Doomsday Overview</h1>
       <p class="landing-subtitle">
-        Velg hvilken dato du vil se nedtellingen for.
+        Choose which countdown you want to see.
       </p>
 
       <section class="new-event-card">
-        <h2 class="new-event-title">Add a new doomsday</h2>
+        <h2 class="new-event-title">Add a new countdown</h2>
         <form id="new-event-form" class="new-event-form">
           <div class="field-group">
             <label for="event-name" class="field-label">Name</label>
@@ -690,7 +690,7 @@
               id="event-name"
               class="field-input"
               type="text"
-              placeholder="Eksamen, prosjekt, ferie..."
+              placeholder="Exam, project, vacation..."
             />
           </div>
           <div class="field-group">
@@ -710,7 +710,7 @@
 
       <div id="landing-grid" class="landing-grid"></div>
       <p id="empty-state" class="empty-state" style="display: none;">
-        No doomsdays yet. Add your first countdown above.
+        No countdowns yet. Add your first one above.
       </p>
     </section>
 
@@ -886,8 +886,8 @@
           <div class="landing-card-inner">
             <div class="landing-header">
               <div class="landing-header-left">
-                <div class="landing-name">${event.name || "Untitled Doomsday"}</div>
-                <div class="landing-pill">Custom Doomsday</div>
+                <div class="landing-name">${event.name || "Untitled Countdown"}</div>
+                <div class="landing-pill">Custom Countdown</div>
               </div>
               <div class="landing-header-right">
                 <button class="delete-btn" type="button" aria-label="Delete countdown">✕</button>
@@ -1001,12 +1001,12 @@
     function updateDetailStatus() {
       const event = getCurrentEvent();
       if (!event) {
-        detailStatusEl.textContent = "No doomsday selected.";
+        detailStatusEl.textContent = "No countdown selected.";
         return;
       }
 
       const targetDate = new Date(event.target);
-      const label = `${event.name || "Untitled Doomsday"} · ${formatDateTime(targetDate)}`;
+      const label = `${event.name || "Untitled Countdown"} · ${formatDateTime(targetDate)}`;
 
       detailStatusEl.innerHTML =
         `Doomsday sequence active. Time until <strong>${label}</strong>. ` +
@@ -1036,7 +1036,7 @@
         detailMinutesEl.textContent = "00";
         detailSecondsEl.textContent = "00";
         detailStatusEl.innerHTML =
-          `<span class="detail-done"><strong>Doomsday for ${event.name || "Untitled Doomsday"} has arrived. 🎉</strong></span>`;
+          `<span class="detail-done"><strong>Doomsday for ${event.name || "Untitled Countdown"} has arrived. 🎉</strong></span>`;
         if (detailIntervalId) {
           clearInterval(detailIntervalId);
           detailIntervalId = null;
@@ -1093,9 +1093,9 @@
       const targetDate = new Date(event.target);
       const formatted = formatDateTime(targetDate);
 
-      detailTagLabelEl.textContent = event.name || "Untitled Doomsday";
+      detailTagLabelEl.textContent = event.name || "Untitled Countdown";
       detailSubtitleEl.innerHTML =
-        `Time remaining until <strong>${event.name || "Untitled Doomsday"}</strong> on ` +
+        `Time remaining until <strong>${event.name || "Untitled Countdown"}</strong> on ` +
         `<span class="detail-date-text">${formatted}</span>.`;
 
       document.querySelectorAll(".detail-mode-btn").forEach((btn) => {
@@ -1148,7 +1148,7 @@
       const nameInput = document.getElementById("event-name");
       const datetimeInput = document.getElementById("event-datetime");
 
-      const name = nameInput.value.trim() || "Untitled Doomsday";
+      const name = nameInput.value.trim() || "Untitled Countdown";
       const dtValue = datetimeInput.value;
 
       if (!dtValue) return;
