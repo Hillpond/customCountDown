@@ -1060,13 +1060,6 @@
       renderLanding();
       updateMiniCountdowns();
       setInterval(updateMiniCountdowns, 1000);
-
-      try {
-        const lastId = localStorage.getItem(STORAGE_LAST_KEY);
-        if (lastId && events.some((e) => e.id === lastId)) {
-          openDetail(lastId);
-        }
-      } catch (e) {}
     })();
   </script>
 </body>
