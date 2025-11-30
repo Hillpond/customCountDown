@@ -130,6 +130,55 @@
       background: rgba(15, 23, 42, 1);
     }
 
+    /* Wrapper so we can place a custom button inside the input area */
+    .field-with-icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .field-with-icon .field-input {
+      padding-right: 2.7rem; /* space for the button */
+    }
+
+    /* Custom calendar button – works in all browsers */
+    .date-trigger {
+      position: absolute;
+      right: 0.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      border-radius: 999px;
+      width: 2rem;
+      height: 2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      cursor: pointer;
+      background: linear-gradient(to right, #ef4444, #fb923c);
+      color: #020106;
+      box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.9),
+        0 0 18px rgba(248, 113, 113, 0.7);
+    }
+
+    .date-trigger:hover {
+      transform: translateY(-50%) translateY(-1px);
+    }
+
+    .date-trigger:active {
+      transform: translateY(-50%);
+      box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.9),
+        0 0 12px rgba(248, 113, 113, 0.5);
+    }
+
+    /* Hide the native calendar icon in Chromium so we don't get two icons */
+    .field-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      opacity: 0;
+    }
+
     .new-event-button {
       border: none;
       border-radius: 999px;
@@ -695,12 +744,21 @@
           </div>
           <div class="field-group">
             <label for="event-datetime" class="field-label">Date & time</label>
-            <input
-              id="event-datetime"
-              class="field-input"
-              type="datetime-local"
-              required
-            />
+            <div class="field-with-icon">
+              <input
+                id="event-datetime"
+                class="field-input"
+                type="datetime-local"
+                required
+              />
+              <button
+                type="button"
+                class="date-trigger"
+                aria-label="Open date &amp; time picker"
+              >
+                📅
+              </button>
+            </div>
           </div>
           <button type="submit" class="new-event-button">
             Add countdown
@@ -1176,11 +1234,29 @@
       datetimeInput.value = "";
     });
 
+    function setupDateTrigger() {
+      const datetimeInput = document.getElementById("event-datetime");
+      const trigger = document.querySelector(".date-trigger");
+      if (!datetimeInput || !trigger) return;
+
+      trigger.addEventListener("click", () => {
+        if (typeof datetimeInput.showPicker === "function") {
+          // Chromium-based browsers: open the native picker
+          datetimeInput.showPicker();
+        } else {
+          // Firefox & others: focus the input so native UI appears
+          datetimeInput.focus();
+        }
+      });
+    }
+
     (function init() {
       events = loadEvents();
       renderLanding();
       updateMiniCountdowns();
       setInterval(updateMiniCountdowns, 1000);
+
+      setupDateTrigger();
     })();
   </script>
 </body>
