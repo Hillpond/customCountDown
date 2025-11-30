@@ -131,24 +131,35 @@
     }
 
     .field-input[type="datetime-local"] {
-      border-color: rgba(248, 113, 113, 0.9);
+      border-color: rgba(248, 113, 113, 0.95);
       background:
-        radial-gradient(circle at 95% 50%, rgba(248, 113, 113, 0.18), transparent 55%)
+        radial-gradient(circle at 95% 50%, rgba(248, 113, 113, 0.24), transparent 55%)
         rgba(15, 23, 42, 0.98);
+      cursor: pointer;
+    }
+
+    .field-input[type="datetime-local"]:hover {
+      border-color: rgba(248, 113, 113, 1);
+      box-shadow:
+        0 0 0 1px rgba(248, 113, 113, 0.8),
+        0 0 26px rgba(248, 113, 113, 0.9);
+      background:
+        radial-gradient(circle at 95% 50%, rgba(248, 113, 113, 0.35), transparent 55%)
+        rgba(15, 23, 42, 1);
     }
 
     .field-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-      padding: 0.25rem;
+      padding: 0.3rem;
       border-radius: 999px;
-      background: radial-gradient(circle at center, #fecaca, #ef4444);
+      background: radial-gradient(circle at center, #fee2e2, #ef4444);
       box-shadow:
-        0 0 6px rgba(248, 113, 113, 0.9),
-        0 0 12px rgba(248, 113, 113, 0.7);
+        0 0 7px rgba(248, 113, 113, 1),
+        0 0 14px rgba(248, 113, 113, 0.9);
       cursor: pointer;
     }
 
     .field-input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-      filter: brightness(1.1);
+      filter: brightness(1.15);
     }
 
     .new-event-button {
@@ -688,7 +699,7 @@
         transform: translateY(6px);
       }
       to {
-        opacity: 1);
+        opacity: 1;
         transform: translateY(0);
       }
     }
@@ -721,6 +732,7 @@
               class="field-input"
               type="datetime-local"
               required
+              title="Click the calendar icon to open the calendar"
             />
           </div>
           <button type="submit" class="new-event-button">
