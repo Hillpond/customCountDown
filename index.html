@@ -89,17 +89,14 @@
     }
 
     .landing-card[data-theme="sauron"] {
-      background:
-        linear-gradient(to bottom right, rgba(5, 1, 0, 0.35), rgba(0, 0, 0, 0.75)),
-        url("sauron-card.jpg");
+      background-image: url("sauron-card.jpg") !important;
       background-size: cover;
       background-position: center top;
+      background-repeat: no-repeat;
     }
-
+    
     .detail-card[data-theme="sauron"] {
-      background:
-        linear-gradient(to right, rgba(5, 1, 0, 0.25) 0%, rgba(5, 1, 0, 0.5) 40%, rgba(0, 0, 0, 0.8) 100%),
-        url("sauron-card.jpg");
+      background-image: url("sauron-card.jpg") !important;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -823,9 +820,6 @@
       <p class="landing-subtitle">
         Choose which countdown you want to see.
       </p>
- <!-- TEST: does the Sauron image load? -->
-  <div style="width:300px;height:150px;background:url('sauron-card.jpg') center/cover no-repeat;"></div>
-
       <section class="new-event-card">
         <h2 class="new-event-title">Add a new countdown</h2>
         <form id="new-event-form" class="new-event-form">
