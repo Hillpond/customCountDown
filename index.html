@@ -16,6 +16,11 @@
       --shadow-soft: 0 25px 60px rgba(0, 0, 0, 0.9);
       --danger: #ef4444;
       --danger-soft: rgba(248, 113, 113, 0.2);
+      --card-bg-1: #020617;
+      --card-bg-2: #020106;
+      --card-border: rgba(148, 27, 27, 0.6);
+      --glow-1: rgba(239, 68, 68, 0.18);
+      --glow-2: rgba(248, 113, 113, 0.18);
     }
 
     .landing-card[data-theme="blood"],
@@ -24,14 +29,24 @@
       --primary-soft: rgba(239, 68, 68, 0.12);
       --danger: #ef4444;
       --danger-soft: rgba(248, 113, 113, 0.2);
+      --card-bg-1: #111827;
+      --card-bg-2: #020617;
+      --card-border: rgba(248, 113, 113, 0.6);
+      --glow-1: rgba(248, 113, 113, 0.28);
+      --glow-2: rgba(220, 38, 38, 0.26);
     }
 
     .landing-card[data-theme="ember"],
     .detail-card[data-theme="ember"] {
       --primary: #fdba74;
-      --primary-soft: rgba(251, 146, 60, 0.15);
+      --primary-soft: rgba(251, 146, 60, 0.18);
       --danger: #fb923c;
-      --danger-soft: rgba(251, 146, 60, 0.25);
+      --danger-soft: rgba(251, 146, 60, 0.26);
+      --card-bg-1: #1c1917;
+      --card-bg-2: #111827;
+      --card-border: rgba(251, 146, 60, 0.7);
+      --glow-1: rgba(251, 146, 60, 0.3);
+      --glow-2: rgba(245, 158, 11, 0.3);
     }
 
     .landing-card[data-theme="toxic"],
@@ -40,14 +55,24 @@
       --primary-soft: rgba(74, 222, 128, 0.18);
       --danger: #22c55e;
       --danger-soft: rgba(34, 197, 94, 0.25);
+      --card-bg-1: #022c22;
+      --card-bg-2: #020617;
+      --card-border: rgba(34, 197, 94, 0.7);
+      --glow-1: rgba(34, 197, 94, 0.35);
+      --glow-2: rgba(22, 163, 74, 0.3);
     }
 
     .landing-card[data-theme="void"],
     .detail-card[data-theme="void"] {
       --primary: #a855f7;
-      --primary-soft: rgba(168, 85, 247, 0.18);
+      --primary-soft: rgba(168, 85, 247, 0.2);
       --danger: #7c3aed;
-      --danger-soft: rgba(124, 58, 237, 0.25);
+      --danger-soft: rgba(124, 58, 237, 0.28);
+      --card-bg-1: #030712;
+      --card-bg-2: #020617;
+      --card-border: rgba(168, 85, 247, 0.7);
+      --glow-1: rgba(168, 85, 247, 0.34);
+      --glow-2: rgba(79, 70, 229, 0.32);
     }
 
     * {
@@ -119,7 +144,7 @@
 
     @media (min-width: 640px) {
       .new-event-form {
-        grid-template-columns: 1.1fr 0.9fr 0.8fr auto; 
+        grid-template-columns: 1.1fr 0.9fr 0.8fr auto;
         align-items: flex-end;
       }
     }
@@ -243,16 +268,16 @@
 
     .landing-card {
       position: relative;
-      background: radial-gradient(circle at top left, #020617, #020106 60%);
+      background: radial-gradient(circle at top left, var(--card-bg-1), var(--card-bg-2) 60%);
       border-radius: var(--card-radius);
       box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(148, 27, 27, 0.6);
+      border: 1px solid var(--card-border);
       padding: 1.7rem 1.5rem 1.6rem;
       cursor: pointer;
       overflow: hidden;
       outline: none;
       transition: transform 0.12s ease-out, box-shadow 0.12s ease-out,
-        border-color 0.12s ease-out;
+        border-color 0.12s ease-out, background 0.12s ease-out;
     }
 
     .landing-card::before {
@@ -260,8 +285,8 @@
       position: absolute;
       inset: -40%;
       background:
-        radial-gradient(circle at top, rgba(239, 68, 68, 0.18), transparent 65%),
-        radial-gradient(circle at bottom right, rgba(248, 113, 113, 0.18), transparent 70%);
+        radial-gradient(circle at top, var(--glow-1), transparent 65%),
+        radial-gradient(circle at bottom right, var(--glow-2), transparent 70%);
       opacity: 0.9;
       mix-blend-mode: screen;
       pointer-events: none;
@@ -272,8 +297,8 @@
       transform: translateY(-4px);
       box-shadow:
         0 28px 70px rgba(0, 0, 0, 0.95),
-        0 0 22px rgba(220, 38, 38, 0.8);
-      border-color: rgba(248, 113, 113, 0.9);
+        0 0 22px rgba(248, 113, 113, 0.8);
+      border-color: var(--primary);
     }
 
     .landing-card-inner {
@@ -293,12 +318,14 @@
       display: flex;
       flex-direction: column;
       gap: 0.2rem;
+      min-width: 0;
     }
 
     .landing-header-right {
       display: flex;
       align-items: center;
       gap: 0.3rem;
+      flex-shrink: 0;
     }
 
     .landing-name {
@@ -306,6 +333,9 @@
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .landing-pill {
@@ -456,10 +486,10 @@
     }
 
     .detail-card {
-      background: radial-gradient(circle at top left, #020617, #020106 60%);
+      background: radial-gradient(circle at top left, var(--card-bg-1), var(--card-bg-2) 60%);
       border-radius: var(--card-radius);
       box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(148, 27, 27, 0.6);
+      border: 1px solid var(--card-border);
       padding: 2.4rem 2.1rem 2.6rem;
       position: relative;
       overflow: hidden;
@@ -475,8 +505,8 @@
       position: absolute;
       inset: -40%;
       background:
-        radial-gradient(circle at top, rgba(239, 68, 68, 0.25), transparent 65%),
-        radial-gradient(circle at bottom right, rgba(248, 113, 113, 0.2), transparent 70%);
+        radial-gradient(circle at top, var(--glow-1), transparent 65%),
+        radial-gradient(circle at bottom right, var(--glow-2), transparent 70%);
       opacity: 0.9;
       pointer-events: none;
       mix-blend-mode: screen;
@@ -515,8 +545,8 @@
       border-radius: 999px;
       background: radial-gradient(circle at 30% 30%, #fee2e2, var(--danger));
       box-shadow:
-        0 0 10px rgba(239, 68, 68, 0.8),
-        0 0 30px rgba(220, 38, 38, 0.7);
+        0 0 10px var(--danger),
+        0 0 30px var(--danger-soft);
       flex-shrink: 0;
       animation: pulse 1.4s infinite alternate;
     }
@@ -539,8 +569,8 @@
       text-transform: uppercase;
       color: var(--primary);
       text-shadow:
-        0 0 8px rgba(248, 113, 113, 0.7),
-        0 0 20px rgba(248, 113, 113, 0.5);
+        0 0 8px var(--primary-soft),
+        0 0 20px var(--primary-soft);
     }
 
     .detail-tag {
@@ -755,6 +785,7 @@
               id="event-name"
               class="field-input"
               type="text"
+              maxlength="32"
               placeholder="Exam, project, vacation..."
             />
           </div>
@@ -954,17 +985,19 @@
         card.className = "landing-card";
         card.tabIndex = 0;
         card.dataset.id = event.id;
-        card.dataset.theme = event.theme || "blood"; 
+        card.dataset.theme = event.theme || "blood";
 
         const dateText = isNaN(targetDate.getTime())
           ? "Invalid date"
           : formatDateTime(targetDate);
 
+        const displayName = (event.name || "Untitled Countdown").slice(0, 32);
+
         card.innerHTML = `
           <div class="landing-card-inner">
             <div class="landing-header">
               <div class="landing-header-left">
-                <div class="landing-name">${event.name || "Untitled Countdown"}</div>
+                <div class="landing-name">${displayName}</div>
                 <div class="landing-pill">Custom Countdown</div>
               </div>
               <div class="landing-header-right">
@@ -1229,7 +1262,8 @@
       const datetimeInput = document.getElementById("event-datetime");
       const themeSelect = document.getElementById("event-theme");
 
-      const name = nameInput.value.trim() || "Untitled Countdown";
+      const rawName = nameInput.value.trim();
+      const name = (rawName || "Untitled Countdown").slice(0, 32);
       const dtValue = datetimeInput.value;
       const theme = (themeSelect && themeSelect.value) || "blood";
 
