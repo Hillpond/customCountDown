@@ -18,6 +18,38 @@
       --danger-soft: rgba(248, 113, 113, 0.2);
     }
 
+    .landing-card[data-theme="blood"],
+    .detail-card[data-theme="blood"] {
+      --primary: #f97373;
+      --primary-soft: rgba(239, 68, 68, 0.12);
+      --danger: #ef4444;
+      --danger-soft: rgba(248, 113, 113, 0.2);
+    }
+
+    .landing-card[data-theme="ember"],
+    .detail-card[data-theme="ember"] {
+      --primary: #fdba74;
+      --primary-soft: rgba(251, 146, 60, 0.15);
+      --danger: #fb923c;
+      --danger-soft: rgba(251, 146, 60, 0.25);
+    }
+
+    .landing-card[data-theme="toxic"],
+    .detail-card[data-theme="toxic"] {
+      --primary: #86efac;
+      --primary-soft: rgba(74, 222, 128, 0.18);
+      --danger: #22c55e;
+      --danger-soft: rgba(34, 197, 94, 0.25);
+    }
+
+    .landing-card[data-theme="void"],
+    .detail-card[data-theme="void"] {
+      --primary: #a855f7;
+      --primary-soft: rgba(168, 85, 247, 0.18);
+      --danger: #7c3aed;
+      --danger-soft: rgba(124, 58, 237, 0.25);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -87,7 +119,7 @@
 
     @media (min-width: 640px) {
       .new-event-form {
-        grid-template-columns: 1.1fr 1fr auto;
+        grid-template-columns: 1.1fr 0.9fr 0.8fr auto; 
         align-items: flex-end;
       }
     }
@@ -146,6 +178,21 @@
       background:
         radial-gradient(circle at 95% 50%, rgba(248, 113, 113, 0.35), transparent 55%)
         rgba(15, 23, 42, 1);
+    }
+
+    select.field-input {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: linear-gradient(45deg, #6b7280 50%, transparent 50%),
+        linear-gradient(135deg, transparent 50%, #6b7280 50%);
+      background-position:
+        calc(100% - 16px) 50%,
+        calc(100% - 12px) 50%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 2.1rem;
+      cursor: pointer;
     }
 
     .new-event-button {
@@ -711,6 +758,17 @@
               placeholder="Exam, project, vacation..."
             />
           </div>
+
+          <div class="field-group">
+            <label for="event-theme" class="field-label">Theme</label>
+            <select id="event-theme" class="field-input">
+              <option value="blood" selected>Blood red</option>
+              <option value="ember">Solar ember</option>
+              <option value="toxic">Toxic green</option>
+              <option value="void">Void purple</option>
+            </select>
+          </div>
+
           <div class="field-group">
             <label for="event-datetime" class="field-label">Date & time</label>
             <input
@@ -896,6 +954,7 @@
         card.className = "landing-card";
         card.tabIndex = 0;
         card.dataset.id = event.id;
+        card.dataset.theme = event.theme || "blood"; 
 
         const dateText = isNaN(targetDate.getTime())
           ? "Invalid date"
@@ -1109,6 +1168,8 @@
       detailMode = "full";
       detailCardEl.setAttribute("data-mode", detailMode);
 
+      detailCardEl.dataset.theme = event.theme || "blood";
+
       const targetDate = new Date(event.target);
       const formatted = formatDateTime(targetDate);
 
@@ -1166,9 +1227,11 @@
       e.preventDefault();
       const nameInput = document.getElementById("event-name");
       const datetimeInput = document.getElementById("event-datetime");
+      const themeSelect = document.getElementById("event-theme");
 
       const name = nameInput.value.trim() || "Untitled Countdown";
       const dtValue = datetimeInput.value;
+      const theme = (themeSelect && themeSelect.value) || "blood";
 
       if (!dtValue) return;
 
@@ -1185,6 +1248,7 @@
         id,
         name,
         target: target.toISOString(),
+        theme,
       });
 
       saveEvents();
