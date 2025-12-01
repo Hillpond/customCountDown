@@ -75,6 +75,36 @@
       --glow-2: rgba(79, 70, 229, 0.32);
     }
 
+    .landing-card[data-theme="sauron"],
+    .detail-card[data-theme="sauron"] {
+      --primary: #fed7aa;
+      --primary-soft: rgba(248, 153, 72, 0.18);
+      --danger: #fb923c;
+      --danger-soft: rgba(248, 153, 72, 0.3);
+      --card-bg-1: #1a0b03;
+      --card-bg-2: #020106;
+      --card-border: rgba(248, 153, 72, 0.85);
+      --glow-1: rgba(248, 153, 72, 0.5);
+      --glow-2: rgba(185, 75, 12, 0.55);
+    }
+
+    .landing-card[data-theme="sauron"] {
+      background:
+        linear-gradient(to bottom right, rgba(5, 1, 0, 0.96), rgba(0, 0, 0, 0.97)),
+        url("sauron-card.jpg");
+      background-size: cover;
+      background-position: center top;
+    }
+
+    .detail-card[data-theme="sauron"] {
+      background:
+        linear-gradient(to right, rgba(5, 1, 0, 0.97) 0%, rgba(5, 1, 0, 0.92) 40%, rgba(0, 0, 0, 0.98) 100%),
+        url("sauron-card.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -588,7 +618,6 @@
       margin-bottom: 0.4rem;
     }
 
-
     .detail-subtitle {
       font-size: 0.95rem;
       color: var(--text-muted);
@@ -798,6 +827,7 @@
               <option value="ember">Solar ember</option>
               <option value="toxic">Toxic green</option>
               <option value="void">Void purple</option>
+              <option value="sauron">Eye of Sauron</option>
             </select>
           </div>
 
@@ -902,6 +932,7 @@
     const detailStatusEl = document.getElementById("detail-status");
     const detailTagLabelEl = document.getElementById("detail-tag-label");
     const detailSubtitleEl = document.getElementById("detail-subtitle");
+    const detailTitleEl = document.querySelector(".detail-title");
 
     const detailDaysEl = document.getElementById("detail-days");
     const detailHoursEl = document.getElementById("detail-hours");
@@ -993,13 +1024,14 @@
           : formatDateTime(targetDate);
 
         const displayName = (event.name || "Untitled Countdown").slice(0, 32);
+        const pillLabel = event.theme === "sauron" ? "Eye of Sauron" : "Custom Countdown";
 
         card.innerHTML = `
           <div class="landing-card-inner">
             <div class="landing-header">
               <div class="landing-header-left">
                 <div class="landing-name">${displayName}</div>
-                <div class="landing-pill">Custom Countdown</div>
+                <div class="landing-pill">${pillLabel}</div>
               </div>
               <div class="landing-header-right">
                 <button class="delete-btn" type="button" aria-label="Delete countdown">✕</button>
@@ -1203,6 +1235,11 @@
       detailCardEl.setAttribute("data-mode", detailMode);
 
       detailCardEl.dataset.theme = event.theme || "blood";
+
+      if (detailTitleEl) {
+        detailTitleEl.textContent =
+          event.theme === "sauron" ? "Eye of Sauron" : "Doomsday Clock";
+      }
 
       const targetDate = new Date(event.target);
       const formatted = formatDateTime(targetDate);
