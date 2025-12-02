@@ -15,7 +15,7 @@
       --card-radius: 1.4rem;
       --shadow-soft: 0 25px 60px rgba(0, 0, 0, 0.9);
       --danger: #ef4444;
-      --danger-soft: rgba(248, 113, 113, 0.2);
+      --danger-soft: #f87171;
       --card-bg-1: #020617;
       --card-bg-2: #020106;
       --card-border: rgba(148, 27, 27, 0.6);
@@ -96,6 +96,37 @@
     .detail-card[data-theme="sauron"] {
       background-image: url("sauron-card.jpg") !important;
       background-position: 50% calc(50% + 280px);
+    }
+
+    /* NEW: Windows XP style theme (green hill + blue sky) */
+    .landing-card[data-theme="xp"],
+    .detail-card[data-theme="xp"] {
+      --primary: #3b82f6;            /* XP-like blue */
+      --primary-soft: rgba(59, 130, 246, 0.22);
+      --danger: #2563eb;
+      --danger-soft: rgba(37, 99, 235, 0.26);
+      --card-bg-1: #0b1120;
+      --card-bg-2: #020617;
+      --card-border: rgba(59, 130, 246, 0.85);
+      --glow-1: rgba(59, 130, 246, 0.42);
+      --glow-2: rgba(34, 197, 94, 0.35);
+    }
+
+    .landing-card[data-theme="xp"] {
+      background:
+        linear-gradient(to top, rgba(16, 185, 129, 0.3), rgba(15, 23, 42, 0.95)),
+        url("xp-card.jpg");
+      background-size: cover;
+      background-position: center bottom;
+    }
+
+    .detail-card[data-theme="xp"] {
+      background:
+        linear-gradient(to right, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.9) 40%, rgba(15, 23, 42, 0.98) 100%),
+        url("xp-card.jpg");
+      background-size: cover;
+      background-position: center bottom;
+      background-repeat: no-repeat;
     }
 
     * {
@@ -305,8 +336,8 @@
     
     .landing-card[data-theme="sauron"] {
       background:
-      linear-gradient(to bottom right, rgba(5, 1, 0, 0.96), rgba(0, 0, 0, 0.97)),
-      url("sauron-card.jpg");
+        linear-gradient(to bottom right, rgba(5, 1, 0, 0.96), rgba(0, 0, 0, 0.97)),
+        url("sauron-card.jpg");
       background-size: cover;
       background-position: 50% calc(50% + 125px);
     }
@@ -535,7 +566,6 @@
       background-position: 50% calc(50% + 280px);
       background-repeat: no-repeat;
     }
-
 
     @media (max-width: 640px) {
       .detail-card {
@@ -839,6 +869,7 @@
               <option value="toxic">Toxic green</option>
               <option value="void">Void purple</option>
               <option value="sauron">Eye of Sauron</option>
+              <option value="xp">Windows hill</option>
             </select>
           </div>
 
@@ -1035,7 +1066,12 @@
           : formatDateTime(targetDate);
 
         const displayName = (event.name || "Untitled Countdown").slice(0, 32);
-        const pillLabel = event.theme === "sauron" ? "Eye of Sauron" : "Custom Countdown";
+        const pillLabel =
+          event.theme === "sauron"
+            ? "Eye of Sauron"
+            : event.theme === "xp"
+            ? "Windows Hill"
+            : "Custom Countdown";
 
         card.innerHTML = `
           <div class="landing-card-inner">
@@ -1249,7 +1285,11 @@
 
       if (detailTitleEl) {
         detailTitleEl.textContent =
-          event.theme === "sauron" ? "Eye of Sauron" : "Doomsday Clock";
+          event.theme === "sauron"
+            ? "Eye of Sauron"
+            : event.theme === "xp"
+            ? "Doomsday XP"
+            : "Doomsday Clock";
       }
 
       const targetDate = new Date(event.target);
