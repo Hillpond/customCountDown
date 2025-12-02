@@ -160,6 +160,37 @@
       background-repeat: no-repeat;
     }
 
+    /* Doomsday theme */
+    .landing-card[data-theme="doomsday"],
+    .detail-card[data-theme="doomsday"] {
+      --primary: #e5e7eb; /* light gray */
+      --primary-soft: rgba(229, 231, 235, 0.2);
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.35);
+      --card-bg-1: #020617;
+      --card-bg-2: #000000;
+      --card-border: rgba(239, 68, 68, 0.85);
+      --glow-1: rgba(239, 68, 68, 0.5);
+      --glow-2: rgba(15, 23, 42, 0.8);
+    }
+
+    .landing-card[data-theme="doomsday"] {
+      background:
+        linear-gradient(to top, rgba(0, 0, 0, 0.96), rgba(15, 23, 42, 0.92)),
+        url("doomsday-card.jpg");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .detail-card[data-theme="doomsday"] {
+      background:
+        linear-gradient(to right, rgba(0, 0, 0, 0.97) 0%, rgba(15, 23, 42, 0.9) 40%, rgba(0, 0, 0, 0.98) 100%),
+        url("doomsday-card.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
     /* One Piece theme */
     .landing-card[data-theme="onepiece"],
     .detail-card[data-theme="onepiece"] {
@@ -934,6 +965,7 @@
               <option value="xp">Windows XP</option>
               <option value="biohazard">Biohazard</option>
               <option value="onepiece">One Piece</option>
+              <option value="doomsday">Doomsday</option>
             </select>
           </div>
 
@@ -1139,6 +1171,8 @@
             ? "Biohazard"
             : event.theme === "onepiece"
             ? "One Piece"
+            : event.theme === "doomsday"
+            ? "Doomsday"
             : "Custom Countdown";
 
         card.innerHTML = `
@@ -1361,6 +1395,8 @@
             ? "Biohazard Alert"
             : event.theme === "onepiece"
             ? "One Piece Voyage"
+            : event.theme === "doomsday"
+            ? "Doomsday"
             : "Doomsday Clock";
       }
 
