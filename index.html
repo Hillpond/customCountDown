@@ -98,7 +98,7 @@
       background-position: 50% calc(50% + 280px);
     }
 
-    /* Windows XP style theme (green hill + blue sky) */
+    /* Windows XP theme */
     .landing-card[data-theme="xp"],
     .detail-card[data-theme="xp"] {
       --primary: #3b82f6;
@@ -132,7 +132,7 @@
     /* Biohazard theme */
     .landing-card[data-theme="biohazard"],
     .detail-card[data-theme="biohazard"] {
-      --primary: #facc15; /* bright yellow */
+      --primary: #facc15;
       --primary-soft: rgba(250, 204, 21, 0.2);
       --danger: #f59e0b;
       --danger-soft: rgba(234, 179, 8, 0.35);
@@ -155,6 +155,37 @@
       background:
         linear-gradient(to right, rgba(0, 0, 0, 0.96) 0%, rgba(15, 23, 42, 0.9) 40%, rgba(0, 0, 0, 0.98) 100%),
         url("biohazard-card.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* One Piece theme */
+    .landing-card[data-theme="onepiece"],
+    .detail-card[data-theme="onepiece"] {
+      --primary: #0ea5e9; /* ocean blue */
+      --primary-soft: rgba(14, 165, 233, 0.22);
+      --danger: #fbbf24;  /* warm gold accent */
+      --danger-soft: rgba(251, 191, 36, 0.3);
+      --card-bg-1: #020617;
+      --card-bg-2: #020617;
+      --card-border: rgba(14, 165, 233, 0.85);
+      --glow-1: rgba(14, 165, 233, 0.42);
+      --glow-2: rgba(251, 191, 36, 0.4);
+    }
+
+    .landing-card[data-theme="onepiece"] {
+      background:
+        linear-gradient(to top, rgba(8, 47, 73, 0.8), rgba(15, 23, 42, 0.9)),
+        url("onepiece-card.jpg");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .detail-card[data-theme="onepiece"] {
+      background:
+        linear-gradient(to right, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.9) 40%, rgba(8, 47, 73, 0.95) 100%),
+        url("onepiece-card.jpg");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -902,6 +933,7 @@
               <option value="sauron">Eye of Sauron</option>
               <option value="xp">Windows XP</option>
               <option value="biohazard">Biohazard</option>
+              <option value="onepiece">One Piece</option>
             </select>
           </div>
 
@@ -1105,6 +1137,8 @@
             ? "Windows XP"
             : event.theme === "biohazard"
             ? "Biohazard"
+            : event.theme === "onepiece"
+            ? "One Piece"
             : "Custom Countdown";
 
         card.innerHTML = `
@@ -1163,7 +1197,7 @@
         landingGrid.appendChild(card);
       });
     }
-    
+
     function updateMiniCountdowns() {
       const nowMs = Date.now();
 
@@ -1325,6 +1359,8 @@
             ? "Doomsday XP"
             : event.theme === "biohazard"
             ? "Biohazard Alert"
+            : event.theme === "onepiece"
+            ? "One Piece Voyage"
             : "Doomsday Clock";
       }
 
