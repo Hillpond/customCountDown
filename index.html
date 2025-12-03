@@ -456,7 +456,6 @@
       border-color: var(--primary);
     }
 
-    /* drag and drop visual states */
     .landing-card.dragging {
       opacity: 0.4;
     }
@@ -1073,7 +1072,7 @@
     let detailMode = "full";
     let currentEventId = null;
     let detailIntervalId = null;
-    let dragSourceId = null; // for drag & drop
+    let dragSourceId = null; 
 
     const landingSection = document.getElementById("landing");
     const detailSection = document.getElementById("detail-view");
@@ -1154,7 +1153,6 @@
       updateMiniCountdowns();
     }
 
-    /* ---------- DRAG AND DROP HELPERS ---------- */
 
     function clearDragState() {
       dragSourceId = null;
@@ -1193,7 +1191,7 @@
 
     function handleDragOver(e) {
       if (!dragSourceId) return;
-      e.preventDefault(); // allow drop
+      e.preventDefault(); 
       if (e.dataTransfer) {
         e.dataTransfer.dropEffect = "move";
       }
@@ -1219,7 +1217,6 @@
       clearDragState();
     }
 
-    /* ---------- RENDERING ---------- */
 
     function renderLanding() {
       landingGrid.innerHTML = "";
@@ -1303,7 +1300,6 @@
         });
 
         card.addEventListener("click", (e) => {
-          // If dragging, ignore click
           if (dragSourceId) return;
           openDetail(event.id);
         });
@@ -1315,7 +1311,6 @@
           }
         });
 
-        // Drag and drop events
         card.addEventListener("dragstart", handleDragStart);
         card.addEventListener("dragenter", handleDragEnter);
         card.addEventListener("dragover", handleDragOver);
