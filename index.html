@@ -456,6 +456,19 @@
       border-color: var(--primary);
     }
 
+    /* drag and drop visual states */
+    .landing-card.dragging {
+      opacity: 0.4;
+    }
+
+    .landing-card.drag-over {
+      transform: translateY(-2px) scale(1.01);
+      border-color: #f97373;
+      box-shadow:
+        0 22px 60px rgba(0, 0, 0, 0.95),
+        0 0 24px rgba(248, 113, 113, 0.9);
+    }
+
     .landing-card-inner {
       position: relative;
       z-index: 1;
@@ -1060,6 +1073,7 @@
     let detailMode = "full";
     let currentEventId = null;
     let detailIntervalId = null;
+    let dragSourceId = null; // for drag & drop
 
     const landingSection = document.getElementById("landing");
     const detailSection = document.getElementById("detail-view");
@@ -1140,6 +1154,73 @@
       updateMiniCountdowns();
     }
 
+    /* ---------- DRAG AND DROP HELPERS ---------- */
+
+    function clearDragState() {
+      dragSourceId = null;
+      document
+        .querySelectorAll(".landing-card.drag-over, .landing-card.dragging")
+        .forEach((card) => {
+          card.classList.remove("drag-over", "dragging");
+        });
+    }
+
+    function reorderEvents(sourceId, targetId) {
+      const fromIndex = events.findIndex((e) => e.id === sourceId);
+      const toIndex = events.findIndex((e) => e.id === targetId);
+      if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+
+      const [moved] = events.splice(fromIndex, 1);
+      events.splice(toIndex, 0, moved);
+      saveEvents();
+      renderLanding();
+      updateMiniCountdowns();
+    }
+
+    function handleDragStart(e) {
+      dragSourceId = this.dataset.id;
+      this.classList.add("dragging");
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", dragSourceId);
+      }
+    }
+
+    function handleDragEnter(e) {
+      if (!dragSourceId || this.dataset.id === dragSourceId) return;
+      this.classList.add("drag-over");
+    }
+
+    function handleDragOver(e) {
+      if (!dragSourceId) return;
+      e.preventDefault(); // allow drop
+      if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = "move";
+      }
+    }
+
+    function handleDragLeave(e) {
+      this.classList.remove("drag-over");
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const targetId = this.dataset.id;
+      if (!dragSourceId || !targetId || targetId === dragSourceId) {
+        clearDragState();
+        return;
+      }
+
+      reorderEvents(dragSourceId, targetId);
+      clearDragState();
+    }
+
+    function handleDragEnd(e) {
+      clearDragState();
+    }
+
+    /* ---------- RENDERING ---------- */
+
     function renderLanding() {
       landingGrid.innerHTML = "";
 
@@ -1156,6 +1237,7 @@
         card.tabIndex = 0;
         card.dataset.id = event.id;
         card.dataset.theme = event.theme || "blood";
+        card.draggable = true; // enable drag
 
         const dateText = isNaN(targetDate.getTime())
           ? "Invalid date"
@@ -1209,7 +1291,7 @@
               </div>
             </div>
             <p class="landing-hint">
-              <span>Click to open detail view</span>
+              <span>Click or drag to reorder</span>
             </p>
           </div>
         `;
@@ -1220,13 +1302,26 @@
           deleteEvent(event.id);
         });
 
-        card.addEventListener("click", () => openDetail(event.id));
+        card.addEventListener("click", (e) => {
+          // If dragging, ignore click
+          if (dragSourceId) return;
+          openDetail(event.id);
+        });
+
         card.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             openDetail(event.id);
           }
         });
+
+        // Drag and drop events
+        card.addEventListener("dragstart", handleDragStart);
+        card.addEventListener("dragenter", handleDragEnter);
+        card.addEventListener("dragover", handleDragOver);
+        card.addEventListener("dragleave", handleDragLeave);
+        card.addEventListener("drop", handleDrop);
+        card.addEventListener("dragend", handleDragEnd);
 
         landingGrid.appendChild(card);
       });
