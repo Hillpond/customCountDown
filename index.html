@@ -456,6 +456,34 @@
     .landing-card.dragging {
       opacity: 0.4;
       cursor: grabbing;
+      z-index: 10;
+    }
+
+    .landing-card.drag-target {
+      box-shadow:
+        0 22px 70px rgba(0, 0, 0, 0.98),
+        0 0 26px rgba(248, 113, 113, 0.9);
+      border-color: #f97373;
+    }
+
+    .landing-card.drag-target::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      bottom: 10px;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, rgba(248,113,113,1), rgba(251,146,60,1));
+      box-shadow: 0 0 18px rgba(248,113,113,0.9);
+      pointer-events: none;
+    }
+
+    .landing-card.drag-target-left::after {
+      left: -2px;
+    }
+
+    .landing-card.drag-target-right::after {
+      right: -2px;
     }
 
     .landing-card-inner {
@@ -1144,45 +1172,81 @@
     }
 
     function clearDragVisual() {
-      if (!dragState) return;
-      const card = dragState.cardEl;
-      card.classList.remove("dragging");
-      card.style.transform = "";
-      card.style.transition = "";
+      document
+        .querySelectorAll(".landing-card")
+        .forEach((card) => {
+          card.classList.remove(
+            "dragging",
+            "drag-target",
+            "drag-target-left",
+            "drag-target-right"
+          );
+          card.style.transform = "";
+          card.style.transition = "";
+        });
+    }
+
+    function updateDragTarget(pointerX, pointerY) {
+      const cards = Array.from(
+        landingGrid.querySelectorAll(".landing-card")
+      );
+
+      let targetCard = null;
+      let targetIndex = -1;
+      let closest = Infinity;
+
+      cards.forEach((card, index) => {
+        if (dragState && card === dragState.cardEl) return;
+        const rect = card.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = centerX - pointerX;
+        const dy = centerY - pointerY;
+        const distSq = dx * dx + dy * dy;
+        if (distSq < closest) {
+          closest = distSq;
+          targetCard = card;
+          targetIndex = index;
+        }
+      });
+
+      cards.forEach((card) =>
+        card.classList.remove("drag-target", "drag-target-left", "drag-target-right")
+      );
+
+      if (!targetCard) {
+        if (dragState) dragState.targetIndex = dragState.fromIndex;
+        return;
+      }
+
+      const rect = targetCard.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+
+      targetCard.classList.add("drag-target");
+      if (pointerX < centerX) {
+        targetCard.classList.add("drag-target-left");
+      } else {
+        targetCard.classList.add("drag-target-right");
+      }
+
+      if (dragState) dragState.targetIndex = targetIndex;
     }
 
     function finishDrag(pointerX, pointerY) {
       if (!dragState) return;
 
       const { fromIndex, id } = dragState;
+      const targetIndex =
+        typeof dragState.targetIndex === "number"
+          ? dragState.targetIndex
+          : fromIndex;
 
       if (!dragState.hasMoved) {
         dragState = null;
+        clearDragVisual();
         openDetail(id);
         return;
       }
-
-      const cards = Array.from(
-        landingGrid.querySelectorAll(".landing-card")
-      );
-
-      let targetIndex = fromIndex;
-      let closestDist = Infinity;
-
-      cards.forEach((card, index) => {
-        const rect = card.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-
-        const dx = centerX - pointerX;
-        const dy = centerY - pointerY;
-        const distSq = dx * dx + dy * dy;
-
-        if (distSq < closestDist) {
-          closestDist = distSq;
-          targetIndex = index;
-        }
-      });
 
       if (targetIndex !== fromIndex) {
         const [moved] = events.splice(fromIndex, 1);
@@ -1193,12 +1257,13 @@
       }
 
       dragState = null;
+      clearDragVisual();
     }
 
     function handleCardPointerDown(e, card, eventId) {
       if (e.pointerType === "mouse" && e.button !== 0) return;
 
-      const fromIndex = events.findIndex(ev => ev.id === eventId);
+      const fromIndex = events.findIndex((ev) => ev.id === eventId);
       if (fromIndex === -1) return;
 
       dragState = {
@@ -1210,7 +1275,8 @@
         lastX: e.clientX,
         lastY: e.clientY,
         fromIndex,
-        hasMoved: false
+        targetIndex: fromIndex,
+        hasMoved: false,
       };
 
       card.classList.add("dragging");
@@ -1233,6 +1299,8 @@
       dragState.lastY = e.clientY;
 
       dragState.cardEl.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+      updateDragTarget(e.clientX, e.clientY);
     }
 
     function handleCardPointerUp(e) {
@@ -1241,7 +1309,6 @@
       const dropX = e.clientX;
       const dropY = e.clientY;
 
-      clearDragVisual();
       dragState.cardEl.releasePointerCapture(e.pointerId);
       finishDrag(dropX, dropY);
     }
