@@ -188,7 +188,6 @@
       background-repeat: no-repeat;
     }
 
-    /* One Piece theme */
     .landing-card[data-theme="onepiece"],
     .detail-card[data-theme="onepiece"] {
       --primary: #0ea5e9;
@@ -417,12 +416,12 @@
       box-shadow: var(--shadow-soft);
       border: 1px solid var(--card-border);
       padding: 1.7rem 1.5rem 1.6rem;
-      cursor: pointer;
+      cursor: grab;
       overflow: hidden;
       outline: none;
       transition: transform 0.12s ease-out, box-shadow 0.12s ease-out,
         border-color 0.12s ease-out, background 0.12s ease-out;
-      touch-action: none; 
+      touch-action: none;
     }
     
     .landing-card[data-theme="sauron"] {
@@ -455,10 +454,8 @@
     }
 
     .landing-card.dragging {
-      opacity: 0.5;
-      box-shadow:
-        0 28px 80px rgba(0, 0, 0, 1),
-        0 0 30px rgba(248, 113, 113, 0.8);
+      opacity: 0.4;
+      cursor: grabbing;
     }
 
     .landing-card-inner {
@@ -1065,7 +1062,6 @@
     let detailMode = "full";
     let currentEventId = null;
     let detailIntervalId = null;
-
     let dragState = null;
 
     const landingSection = document.getElementById("landing");
@@ -1147,7 +1143,6 @@
       updateMiniCountdowns();
     }
 
-
     function clearDragVisual() {
       if (!dragState) return;
       const card = dragState.cardEl;
@@ -1156,13 +1151,12 @@
       card.style.transition = "";
     }
 
-    function finishDrag(pointerY) {
+    function finishDrag(pointerX, pointerY) {
       if (!dragState) return;
 
-      const { fromIndex } = dragState;
+      const { fromIndex, id } = dragState;
 
       if (!dragState.hasMoved) {
-        const id = dragState.id;
         dragState = null;
         openDetail(id);
         return;
@@ -1171,15 +1165,21 @@
       const cards = Array.from(
         landingGrid.querySelectorAll(".landing-card")
       );
+
       let targetIndex = fromIndex;
       let closestDist = Infinity;
 
       cards.forEach((card, index) => {
         const rect = card.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-        const dist = Math.abs(pointerY - centerY);
-        if (dist < closestDist) {
-          closestDist = dist;
+
+        const dx = centerX - pointerX;
+        const dy = centerY - pointerY;
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq < closestDist) {
+          closestDist = distSq;
           targetIndex = index;
         }
       });
@@ -1205,7 +1205,9 @@
         id: eventId,
         cardEl: card,
         pointerId: e.pointerId,
+        startX: e.clientX,
         startY: e.clientY,
+        lastX: e.clientX,
         lastY: e.clientY,
         fromIndex,
         hasMoved: false
@@ -1219,24 +1221,30 @@
     function handleCardPointerMove(e) {
       if (!dragState || e.pointerId !== dragState.pointerId) return;
 
+      const deltaX = e.clientX - dragState.startX;
       const deltaY = e.clientY - dragState.startY;
-      if (Math.abs(deltaY) > 4) {
+
+      const dist = Math.hypot(deltaX, deltaY);
+      if (dist > 4) {
         dragState.hasMoved = true;
       }
 
+      dragState.lastX = e.clientX;
       dragState.lastY = e.clientY;
-      dragState.cardEl.style.transform = `translateY(${deltaY}px)`;
+
+      dragState.cardEl.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     }
 
     function handleCardPointerUp(e) {
       if (!dragState || e.pointerId !== dragState.pointerId) return;
 
+      const dropX = e.clientX;
+      const dropY = e.clientY;
+
       clearDragVisual();
       dragState.cardEl.releasePointerCapture(e.pointerId);
-      const dropY = e.clientY;
-      finishDrag(dropY);
+      finishDrag(dropX, dropY);
     }
-
 
     function renderLanding() {
       landingGrid.innerHTML = "";
@@ -1318,19 +1326,19 @@
           deleteEvent(event.id);
         });
 
-        card.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            openDetail(event.id);
-          }
-        });
-
         card.addEventListener("pointerdown", (e) =>
           handleCardPointerDown(e, card, event.id)
         );
         card.addEventListener("pointermove", handleCardPointerMove);
         card.addEventListener("pointerup", handleCardPointerUp);
         card.addEventListener("pointercancel", handleCardPointerUp);
+
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openDetail(event.id);
+          }
+        });
 
         landingGrid.appendChild(card);
       });
