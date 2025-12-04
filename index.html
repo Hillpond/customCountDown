@@ -98,7 +98,6 @@
       background-position: 50% calc(50% + 280px);
     }
 
-    /* Windows XP theme */
     .landing-card[data-theme="xp"],
     .detail-card[data-theme="xp"] {
       --primary: #3b82f6;
@@ -129,7 +128,6 @@
       background-repeat: no-repeat;
     }
 
-    /* Biohazard theme */
     .landing-card[data-theme="biohazard"],
     .detail-card[data-theme="biohazard"] {
       --primary: #facc15;
@@ -160,10 +158,9 @@
       background-repeat: no-repeat;
     }
 
-    /* Doomsday theme */
     .landing-card[data-theme="doomsday"],
     .detail-card[data-theme="doomsday"] {
-      --primary: #e5e7eb; /* light gray */
+      --primary: #e5e7eb;
       --primary-soft: rgba(229, 231, 235, 0.2);
       --danger: #ef4444;
       --danger-soft: rgba(239, 68, 68, 0.35);
@@ -194,9 +191,9 @@
     /* One Piece theme */
     .landing-card[data-theme="onepiece"],
     .detail-card[data-theme="onepiece"] {
-      --primary: #0ea5e9; /* ocean blue */
+      --primary: #0ea5e9;
       --primary-soft: rgba(14, 165, 233, 0.22);
-      --danger: #fbbf24;  /* warm gold accent */
+      --danger: #fbbf24;
       --danger-soft: rgba(251, 191, 36, 0.3);
       --card-bg-1: #020617;
       --card-bg-2: #020617;
@@ -425,6 +422,7 @@
       outline: none;
       transition: transform 0.12s ease-out, box-shadow 0.12s ease-out,
         border-color 0.12s ease-out, background 0.12s ease-out;
+      touch-action: none; 
     }
     
     .landing-card[data-theme="sauron"] {
@@ -457,15 +455,10 @@
     }
 
     .landing-card.dragging {
-      opacity: 0.4;
-    }
-
-    .landing-card.drag-over {
-      transform: translateY(-2px) scale(1.01);
-      border-color: #f97373;
+      opacity: 0.5;
       box-shadow:
-        0 22px 60px rgba(0, 0, 0, 0.95),
-        0 0 24px rgba(248, 113, 113, 0.9);
+        0 28px 80px rgba(0, 0, 0, 1),
+        0 0 30px rgba(248, 113, 113, 0.8);
     }
 
     .landing-card-inner {
@@ -1072,7 +1065,8 @@
     let detailMode = "full";
     let currentEventId = null;
     let detailIntervalId = null;
-    let dragSourceId = null; 
+
+    let dragState = null;
 
     const landingSection = document.getElementById("landing");
     const detailSection = document.getElementById("detail-view");
@@ -1154,67 +1148,93 @@
     }
 
 
-    function clearDragState() {
-      dragSourceId = null;
-      document
-        .querySelectorAll(".landing-card.drag-over, .landing-card.dragging")
-        .forEach((card) => {
-          card.classList.remove("drag-over", "dragging");
-        });
+    function clearDragVisual() {
+      if (!dragState) return;
+      const card = dragState.cardEl;
+      card.classList.remove("dragging");
+      card.style.transform = "";
+      card.style.transition = "";
     }
 
-    function reorderEvents(sourceId, targetId) {
-      const fromIndex = events.findIndex((e) => e.id === sourceId);
-      const toIndex = events.findIndex((e) => e.id === targetId);
-      if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+    function finishDrag(pointerY) {
+      if (!dragState) return;
 
-      const [moved] = events.splice(fromIndex, 1);
-      events.splice(toIndex, 0, moved);
-      saveEvents();
-      renderLanding();
-      updateMiniCountdowns();
-    }
+      const { fromIndex } = dragState;
 
-    function handleDragStart(e) {
-      dragSourceId = this.dataset.id;
-      this.classList.add("dragging");
-      if (e.dataTransfer) {
-        e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("text/plain", dragSourceId);
-      }
-    }
-
-    function handleDragEnter(e) {
-      if (!dragSourceId || this.dataset.id === dragSourceId) return;
-      this.classList.add("drag-over");
-    }
-
-    function handleDragOver(e) {
-      if (!dragSourceId) return;
-      e.preventDefault(); 
-      if (e.dataTransfer) {
-        e.dataTransfer.dropEffect = "move";
-      }
-    }
-
-    function handleDragLeave(e) {
-      this.classList.remove("drag-over");
-    }
-
-    function handleDrop(e) {
-      e.preventDefault();
-      const targetId = this.dataset.id;
-      if (!dragSourceId || !targetId || targetId === dragSourceId) {
-        clearDragState();
+      if (!dragState.hasMoved) {
+        const id = dragState.id;
+        dragState = null;
+        openDetail(id);
         return;
       }
 
-      reorderEvents(dragSourceId, targetId);
-      clearDragState();
+      const cards = Array.from(
+        landingGrid.querySelectorAll(".landing-card")
+      );
+      let targetIndex = fromIndex;
+      let closestDist = Infinity;
+
+      cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        const centerY = rect.top + rect.height / 2;
+        const dist = Math.abs(pointerY - centerY);
+        if (dist < closestDist) {
+          closestDist = dist;
+          targetIndex = index;
+        }
+      });
+
+      if (targetIndex !== fromIndex) {
+        const [moved] = events.splice(fromIndex, 1);
+        events.splice(targetIndex, 0, moved);
+        saveEvents();
+        renderLanding();
+        updateMiniCountdowns();
+      }
+
+      dragState = null;
     }
 
-    function handleDragEnd(e) {
-      clearDragState();
+    function handleCardPointerDown(e, card, eventId) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+
+      const fromIndex = events.findIndex(ev => ev.id === eventId);
+      if (fromIndex === -1) return;
+
+      dragState = {
+        id: eventId,
+        cardEl: card,
+        pointerId: e.pointerId,
+        startY: e.clientY,
+        lastY: e.clientY,
+        fromIndex,
+        hasMoved: false
+      };
+
+      card.classList.add("dragging");
+      card.style.transition = "transform 0.05s ease-out";
+      card.setPointerCapture(e.pointerId);
+    }
+
+    function handleCardPointerMove(e) {
+      if (!dragState || e.pointerId !== dragState.pointerId) return;
+
+      const deltaY = e.clientY - dragState.startY;
+      if (Math.abs(deltaY) > 4) {
+        dragState.hasMoved = true;
+      }
+
+      dragState.lastY = e.clientY;
+      dragState.cardEl.style.transform = `translateY(${deltaY}px)`;
+    }
+
+    function handleCardPointerUp(e) {
+      if (!dragState || e.pointerId !== dragState.pointerId) return;
+
+      clearDragVisual();
+      dragState.cardEl.releasePointerCapture(e.pointerId);
+      const dropY = e.clientY;
+      finishDrag(dropY);
     }
 
 
@@ -1234,7 +1254,6 @@
         card.tabIndex = 0;
         card.dataset.id = event.id;
         card.dataset.theme = event.theme || "blood";
-        card.draggable = true; // enable drag
 
         const dateText = isNaN(targetDate.getTime())
           ? "Invalid date"
@@ -1288,7 +1307,7 @@
               </div>
             </div>
             <p class="landing-hint">
-              <span>Click or drag to reorder</span>
+              <span>Tap or drag to reorder</span>
             </p>
           </div>
         `;
@@ -1299,11 +1318,6 @@
           deleteEvent(event.id);
         });
 
-        card.addEventListener("click", (e) => {
-          if (dragSourceId) return;
-          openDetail(event.id);
-        });
-
         card.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
@@ -1311,12 +1325,12 @@
           }
         });
 
-        card.addEventListener("dragstart", handleDragStart);
-        card.addEventListener("dragenter", handleDragEnter);
-        card.addEventListener("dragover", handleDragOver);
-        card.addEventListener("dragleave", handleDragLeave);
-        card.addEventListener("drop", handleDrop);
-        card.addEventListener("dragend", handleDragEnd);
+        card.addEventListener("pointerdown", (e) =>
+          handleCardPointerDown(e, card, event.id)
+        );
+        card.addEventListener("pointermove", handleCardPointerMove);
+        card.addEventListener("pointerup", handleCardPointerUp);
+        card.addEventListener("pointercancel", handleCardPointerUp);
 
         landingGrid.appendChild(card);
       });
